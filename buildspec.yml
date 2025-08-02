@@ -31,23 +31,13 @@ phases:
 
   post_build:
     commands:
-      - echo "[POST_BUILD] Build completed on $(date)"
-      - echo "[POST_BUILD] Pushing Docker image to registry..."
+      - echo Build completed on `date`
+      - echo Pushing the Docker image...
       - docker push $IMAGE_NAME:latest
-
-      - echo "[POST_BUILD] Verifying and uploading zip to S3..."
-      - ls -lh
-      - if [ -f "online-shop-app.zip" ]; then
-          echo "✅ Zip file found, uploading...";
-          aws s3 cp online-shop-app.zip s3://tws-online-shop-demo/online-shop-app/;
-        else
-          echo "❌ Zip file not found! Upload aborted.";
-          exit 1;
-        fi
-
-      - echo "[POST_BUILD] Writing image definitions file..."
+      - echo Uploading zip file to S3 root location...
+      - aws s3 cp online-shop-app.zip s3://tws-online-shop-demo/online-shop-app/ # Upload zip file to the root of the bucket
+      - echo Writing image definitions file...
       - printf '{"ImageURI":"%s", "Port":8000}' $IMAGE_NAME:latest > imageDefinitions.json
-      - echo "[POST_BUILD] Contents of imageDefinitions.json:"
       - cat imageDefinitions.json
 
 artifacts:
