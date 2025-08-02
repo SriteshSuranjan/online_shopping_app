@@ -25,7 +25,7 @@ phases:
     commands:
       - echo "[BUILD] Build started on $(date)"
       - echo "[BUILD] Packaging application into zip file..."
-      - zip -r online-shop-app.zip . || (echo "❌ Failed to create zip file" && exit 1)
+      - zip -r ../online-shop-app.zip .
       - echo "[BUILD] Building Docker image..."
       - docker build -t $IMAGE_NAME:latest .
 
