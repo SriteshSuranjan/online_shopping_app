@@ -9,39 +9,37 @@ env:
 phases:
   install:
     runtime-versions:
-      # nodejs: 12.2.0
       nodejs: 18
     commands:
-      - echo Installing Node.js and npm...
-      # - n 12.2.0
+      - echo "Installing Node.js and setting npm registry..."
       - npm config set registry https://registry.npmjs.org/
 
   pre_build:
     commands:
-      - echo Logging in to Docker Registry...
+      - echo "Logging in to Docker Registry..."
       - echo "$DOCKER_REGISTRY_PASSWORD" | docker login -u "$DOCKER_REGISTRY_USERNAME" --password-stdin "$DOCKER_REGISTRY_URL"
       - IMAGE_REPO_NAME="tws-online-shop-app-demo"
       - IMAGE_NAME="$DOCKER_REGISTRY_USERNAME/$IMAGE_REPO_NAME"
 
   build:
     commands:
-      - echo Build started on `date`
-      - echo Packaging application into a zip file...
-      - zip -r online-shop-app.zip * .[^.]* # Include all files and directories, including hidden files
-      - echo Building the Docker image...
+      - echo "Build started on $(date)"
+      - echo "Packaging application into a zip file..."
+      - zip -r online-shop-app.zip * .[^.]* # Includes hidden files
+      - echo "Building the Docker image..."
       - docker build -t $IMAGE_NAME:latest .
 
   post_build:
     commands:
-      - echo Build completed on `date`
-      - echo Pushing the Docker image...
+      - echo "Build completed on $(date)"
+      - echo "Pushing the Docker image to registry..."
       - docker push $IMAGE_NAME:latest
-      - echo Uploading zip file to S3 root location...
-      - aws s3 cp online-shop-app.zip s3://tws-online-shop-demo/online-shop-app/ # Upload zip file to the root of the bucket
-      - echo Writing image definitions file...
+      - echo "Uploading zip file to S3 bucket..."
+      - aws s3 cp online-shop-app.zip s3://tws-online-shop-demo/online-shop-app/
+      - echo "Writing image definitions file for deployment..."
       - printf '{"ImageURI":"%s", "Port":8000}' $IMAGE_NAME:latest > imageDefinitions.json
       - cat imageDefinitions.json
-      
+
 artifacts:
   files:
     - '**/*'
