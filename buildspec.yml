@@ -9,10 +9,11 @@ env:
 phases:
   install:
     runtime-versions:
-      nodejs: 12.2.0
+      # nodejs: 12.2.0
+      nodejs: 18
     commands:
       - echo Installing Node.js and npm...
-      - n 12.2.0
+      # - n 12.2.0
       - npm config set registry https://registry.npmjs.org/
 
   pre_build:
