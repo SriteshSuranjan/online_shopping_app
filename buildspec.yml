@@ -29,16 +29,26 @@ phases:
       - echo "[BUILD] Building Docker image..."
       - docker build -t $IMAGE_NAME:latest .
 
-  post_build:
-    commands:
-      - echo Build completed on `date`
-      - echo Pushing the Docker image...
-      - docker push $IMAGE_NAME:latest
-      - echo Uploading zip file to S3 root location...
-      - aws s3 cp online-shop-app.zip s3://tws-online-shop-demo/online-shop-app/ # Upload zip file to the root of the bucket
-      - echo Writing image definitions file...
-      - printf '{"ImageURI":"%s", "Port":8000}' $IMAGE_NAME:latest > imageDefinitions.json
-      - cat imageDefinitions.json
+  # post_build:
+  #   commands:
+  #     - echo Build completed on `date`
+  #     - echo Pushing the Docker image...
+  #     - docker push $IMAGE_NAME:latest
+  #     - echo Uploading zip file to S3 root location...
+  #     - aws s3 cp online-shop-app.zip s3://tws-online-shop-demo/online-shop-app/ # Upload zip file to the root of the bucket
+  #     - echo Writing image definitions file...
+  #     - printf '{"ImageURI":"%s", "Port":8000}' $IMAGE_NAME:latest > imageDefinitions.json
+  #     - cat imageDefinitions.json
+
+post_build:
+  commands:
+    - echo Build completed on `date`
+    - echo Pushing the Docker image...
+    - docker push $IMAGE_NAME:latest
+    - echo Listing files to confirm zip exists...
+    - ls -lh
+    - echo Uploading zip file to S3 root location...
+    - aws s3 cp online-shop-app.zip s3://tws-online-shop-demo/online-shop-app/
 
 artifacts:
   files:
